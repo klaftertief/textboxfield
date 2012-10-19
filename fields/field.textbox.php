@@ -6,13 +6,14 @@
 
 	if (!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 
+	require_once FACE . '/interface.exportablefield.php';
 	require_once(TOOLKIT . '/class.xsltprocess.php');
 	require_once(EXTENSIONS . '/textboxfield/extension.driver.php');
 
 	/**
 	 * An enhanced text input field.
 	 */
-	class FieldTextBox extends Field {
+	class FieldTextBox extends Field implements ExportableField {
 	/*-------------------------------------------------------------------------
 		Definition:
 	-------------------------------------------------------------------------*/
@@ -617,6 +618,36 @@
 			}
 
 			return $data['handle'];
+		}
+
+	/*-------------------------------------------------------------------------
+		Export:
+	-------------------------------------------------------------------------*/
+
+		public function getExportModes() {
+			return array(
+				ExportableField::FORMATTED,
+				ExportableField::UNFORMATTED,
+				ExportableField::HANDLE
+			);
+		}
+
+		public function prepareExportValue($data, $mode, $entry_id = null) {
+			// Not in expected format:
+			if (isset($data['handle'], $data['value'], $data['value_formatted']) === false) {
+				return null;
+			}
+
+			switch ($mode) {
+				case ExportableField::FORMATTED:
+					return $data['value_formatted'];
+				case ExportableField::UNFORMATTED:
+					return $data['value'];
+				case ExportableField::HANDLE:
+					return $data['handle'];
+			}
+
+			return null;
 		}
 
 	/*-------------------------------------------------------------------------
